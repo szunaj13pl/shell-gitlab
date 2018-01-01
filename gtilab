@@ -1,0 +1,105 @@
+#!/bin/bash
+
+# Janusz Ładecki <szunaj13pl@gmail.com>
+# 21.09.2017
+
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+function isInstalled(){
+#   $1  Package name
+packageName=$1
+
+    INSTALLED=$(dpkg-query -s "$packageName" 2>&1 | grep --no-messages Status )
+    if [ "$INSTALLED" != "Status: install ok installed" ]; then
+        echo -e "${NC} $packageName ${RED}not installed ${NC}"
+        sudo apt install -y "$packageName"
+    fi
+}
+
+isInstalled curl
+isInstalled git 
+isInstalled jq
+isInstalled dialog
+
+# GITLAB_URL=""
+# GITLAB_PRIVATE_TOKEN=""
+
+gitlabScript="$HOME/gitlab-script.sh"
+gitlabNames="$HOME/projects_names.gl"
+gitlabGit="$HOME/projects_git.gl"
+
+if [ -z "$GITLAB_URL" ]; then
+    echo -e "${RED}Please set the environment variable GITLAB_URL ${NC}"
+    exit 1
+fi
+
+if [ -z "$GITLAB_PRIVATE_TOKEN" ]; then
+    echo -e "${RED}Please set the environment variable GITLAB_PRIVATE_TOKEN ${NC}"
+    echo "See ${GITLAB_URL}profile/account"
+    exit 1
+fi
+
+ping -c 2 "$GITLAB_URL" > /dev/null || echo -e "$GITLAB_URL ${RED} Unrechable ${NC}" && exit 1 
+
+online=$(curl -s "${GITLAB_URL}api/v3/projects?private_token=$GITLAB_PRIVATE_TOKEN&search=$PROJECT_SEARCH_PARAM&per_page=999" \
+    | jq --raw-output --compact-output ".[]  | { "name": .name, "path": .path, "git": .ssh_url_to_repo }") 
+
+rm -f "$gitlabNames" "$gitlabGit" "$gitlabScript"
+touch "$gitlabNames" "$gitlabGit" "$gitlabScript"
+
+i=1
+echo "$online" | while read line;do
+
+    git="$(echo $line | jq -r ".git")"
+    echo -e "$i) git clone -v $git ;;" >> "$gitlabGit"
+
+    name="$(echo $line | jq -r ".name")"
+    projects_names=$(echo $i" "\""$name"\" "off" >> "$gitlabNames")
+
+i=$[i+1]
+done
+
+
+projects_names="$(cat $gitlabNames)"
+
+cat >> "$gitlabScript" <<- EndOfScript
+#!/bin/bash
+
+# Janusz Ładecki <szunaj13pl@gmail.com>
+# 21.09.2017
+
+TYPE="checklist"
+HEIGHT=49
+WIDTH=60
+CHOICE_HEIGHT=42
+BACKTITLE="GitLab"
+TITLE="GitLab"
+MENU="Choose repo to clone:"
+
+
+OPTIONS=($(cat $gitlabNames))
+
+    CHOICES=\$(dialog  --separate-output --checklist   \
+            "\$MENU" \
+            \$HEIGHT \$WIDTH \$CHOICE_HEIGHT \
+            "\${OPTIONS[@]}" \
+            2>&1 >/dev/tty)
+
+clear
+
+for choice in \$CHOICES
+do
+    case \$choice in 
+EndOfScript
+
+cat "$gitlabGit" >> "$gitlabScript" 
+
+echo -e "esac \ndone" >> "$gitlabScript" 
+
+# Run 
+chmod +x "$gitlabScript"
+"$gitlabScript"
+# Cleaning
+rm -f "$gitlabNames" "$gitlabGit" "$gitlabScript"
+
