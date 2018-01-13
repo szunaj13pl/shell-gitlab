@@ -15,20 +15,23 @@ gitlabNames=$(mktemp /tmp/$scriptName.XXXXXX)
 gitlabGit=$(mktemp /tmp/$scriptName.XXXXXX)
 
 function isInstalled(){
-
-    local packageName=$1
     
-    INSTALLED=$(dpkg-query -s "$packageName" 2>&1 | grep --no-messages Status )
-    if [ "$INSTALLED" != "Status: install ok installed" ]; then
-        echo -e "${NC} $packageName ${RED}not installed ${NC}"
-        sudo apt install -y "$packageName"
-    fi
-
+    local packagesName=$@
+    
+    for package in $packagesName; do
+        echo "$package"
+        INSTALLED=$(dpkg-query -s "$packageName" 2>&1 | grep --no-messages Status )
+        if [ "$INSTALLED" != "Status: install ok installed" ]; then
+            echo -e "${NC} $packageName ${RED}not installed ${NC}"
+            sudo apt install -y "$packageName"
+        fi
+    done
+    
 }
 
 
 function preRunCheck(){
-
+    
     if [ -z "$GITLAB_URL" ]; then
         echo -e "${RED}Please set the environment variable GITLAB_URL ${NC}"
         exit 1
@@ -41,7 +44,7 @@ function preRunCheck(){
     fi
     
     ping -c 2 "$GITLAB_URL" > /dev/null || (echo -e "$GITLAB_URL ${RED} Unrechable ${NC}" && exit 1)
-
+    
 }
 
 
@@ -61,7 +64,7 @@ function getData(){
         
         i=$[i+1]
     done
-
+    
 }
 
 
@@ -110,10 +113,7 @@ EndOfScript
 
 
 # Install requierd programs
-isInstalled curl
-isInstalled git
-isInstalled jq
-isInstalled dialog
+isInstalled curl git jq dialog
 
 preRunCheck
 getData
