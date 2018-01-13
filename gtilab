@@ -30,8 +30,8 @@ function isInstalled(){
     for package in $packagesName; do
         INSTALLED=$(dpkg-query -s "$package" 2>&1 | grep --no-messages Status )
         if [ "$INSTALLED" != "Status: install ok installed" ]; then
-            echo -e "${NC} $packageName ${RED}not installed ${NC}"
-            sudo apt install -y "$packageName"
+            echo -e "${NC} $package ${RED}not installed ${NC}"
+            sudo apt install -y "$package"
         fi
     done
     
