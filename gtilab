@@ -102,13 +102,10 @@ function measureScreen(){
 
 function createGui(){
     local TYPE="checklist"
-    local HEIGHT=\$rows
+    local HEIGHT=\$((rows - 3))
     local WIDTH=\$(( cols / 2))
-    local CHOICE_HEIGHT=\$(( rows - 4))
-    local BACKTITLE="GitLab"
-    local TITLE="GitLab"
-    local MENU="Choose repo to clone:"
-
+    local CHOICE_HEIGHT=\$(( rows - 5))
+    local MENU="by Janusz Ładecki\n\nChoose repo to clone:"
 
     local OPTIONS=($(cat $gitlabNames))
 
