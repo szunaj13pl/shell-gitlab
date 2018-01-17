@@ -1,8 +1,11 @@
 #!/bin/bash
 
 # Janusz Ładecki <szunaj13pl@gmail.com>
-# 21.09.2017
+# Created on 21.09.2017
 
+gitlab_version=1.1.2
+github_url='https://raw.githubusercontent.com/szunaj13pl/shell-gitlab/master/'
+gitlab_config_folder="$HOME/.config/gitlab"
 
 # Parameters
 # GITLAB_URL=""
@@ -13,6 +16,7 @@ PROJECT_SEARCH_PARAM=$1
 function initial(){
     
     local scriptName=$(basename $0)
+    scriptServerVersion=$(mktemp /tmp/$scriptName.XXXXXX)
     gitlabScript=$(mktemp /tmp/$scriptName.XXXXXX)
     gitlabNames=$(mktemp /tmp/$scriptName.XXXXXX)
     gitlabGit=$(mktemp /tmp/$scriptName.XXXXXX)
@@ -20,6 +24,97 @@ function initial(){
     # Colors
     RED='\033[0;31m'
     NC='\033[0m' # No Color
+}
+
+
+versionCompare () {
+    if [[ $1 == $2 ]]
+    then
+        return 0
+    fi
+    local IFS=.
+    local i ver1=($1) ver2=($2)
+    
+    # fill empty fields in ver1 with zeros
+    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
+    do
+        ver1[i]=0
+    done
+    for ((i=0; i<${#ver1[@]}; i++))
+    do
+        if [[ -z ${ver2[i]} ]]
+        then
+            # fill empty fields in ver2 with zeros
+            ver2[i]=0
+        fi
+        if ((10#${ver1[i]} > 10#${ver2[i]}))
+        then
+            
+            return 1
+        fi
+        if ((10#${ver1[i]} < 10#${ver2[i]}))
+        then
+            
+            return 2
+        fi
+    done
+    
+    return 0
+    
+}
+
+
+function checkConfig(){
+    
+    if [ ! -s "${gitlab_config_folder}/config" ]; then
+        
+        mkdir -p "$gitlab_config_folder" || echo "Can not create default config at ${gitlab_config_folder}/config" && echo "Default config was created"
+        
+        curl "${github_url}default_config" -s -o "${gitlab_config_folder}/default_config"\
+        && mv "${gitlab_config_folder}/config" "${gitlab_config_folder}/config.bak"\
+        && cp "${gitlab_config_folder}/default_config" "${gitlab_config_folder}/config"
+        
+    fi
+    
+}
+
+
+function checkLastUpdateDate(){
+    
+    # Get last update date from config
+    local last_update_date=$(cat "${gitlab_config_folder}/config" | grep --perl-regexp  'last_update_date\=([0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2})' | cut -d "=" -f 2)
+    local current_date=$(date +%F)
+    
+    if [[ ! "$current_date" == "$last_update_date" ]]
+    then
+        echo "Check update" && checkOnlineVersion
+        sed -E -i "s/last_update_date\=([0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2})/last_update_date\=$current_date/" ${gitlab_config_folder}/config\
+        || echo "Missing 'last_update_date' parameter in ${gitlab_config_folder}/config"
+    fi
+    
+}
+
+
+function checkOnlineVersion(){
+    
+    ping -c 2 Github.com 2>>/dev/null 1>&2 || (echo -e "Github.com ${RED} Unrechable ${NC}" && exit 1) || return 1 && exit 0
+    
+    local server_version=$(curl "${github_url}gitlab" -s -o $scriptServerVersion | grep --max-count=1 'gitlab_version' |  cut -d "=" -f 2)
+    
+    versionCompare $gitlab_version $server_version || (echo "New wersion on GitHub" && replaceLocalScript $server_version )
+}
+
+function replaceLocalScript(){
+    
+    local online_version="$1"
+    local script_full_path=$(where gitlab | head -n 1)
+    
+    cp $script_full_path ${script_full_path}.bak \
+    && cp "$scriptServerVersion" $(dirname $script_full_path) \
+    && sed -i "s/last_update_date=$local_version/last_update_date=$online_version/g" "$gitlab_config_folder/config"
+    
+    # Cleaning
+    rm -f "$scriptServerVersion" "${script_full_path}.bak"
 }
 
 
@@ -66,7 +161,7 @@ function getData(){
 
 
 function formatData(){
-
+    
     local online="$1"
     i=1
     echo "$online" | while read line;do
@@ -78,7 +173,7 @@ function formatData(){
         local projects_names=$(echo $i" "\""$name"\" "off" >> "$gitlabNames")
         
         i=$[i+1]
-
+        
     done
 }
 
@@ -143,6 +238,12 @@ initial
 
 # Install requierd programs
 isInstalled curl git jq dialog
+
+# Check if config exist 
+checkConfig
+
+# Check for new update
+checkLastUpdateDate
 
 # Check if all variables ar defined and server is online
 preRunCheck
