@@ -3,7 +3,7 @@
 # Janusz Ładecki <szunaj13pl@gmail.com>
 # Created on 21.09.2017
 
-gitlab_version=18.1.2356
+gitlab_version=18.1.2355
 github_url='https://github.com/szunaj13pl/shell-gitlab'
 gitlab_config_folder="$HOME/.config/gitlab"
 
@@ -100,12 +100,12 @@ function checkLastUpdateDate(){
     
     # Get last update date from config
     local last_update_date=$(cat "${gitlab_config_folder}/config" | grep --perl-regexp  'last_update_date\=([0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2})' | cut -d "=" -f 2)
-    local current_date=$(date +%F)
+    local current_date="$(date +%F)"
     
     if [[ ! "$current_date" == "$last_update_date" ]]
     then
         echo "Check update" && checkOnlineVersion
-        sed -E -i "s/last_update_date\=([0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2})/last_update_date\=$current_date/" ${gitlab_config_folder}/config\
+        sed -E -i "s/last_update_date\=([0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2})/last_update_date\=$current_date/" "${gitlab_config_folder}/config"\
         || echo "Missing 'last_update_date' parameter in ${gitlab_config_folder}/config"
     fi
     
@@ -130,9 +130,8 @@ function replaceLocalScript(){
     
     cp "$script_full_path" "${script_full_path}.bak" \
     && cp "${scriptServerVersion}/gitlab" $(dirname $script_full_path) \
-    && refreshDefaultConfigFile \
-    && sed -i "s/last_update_date=$local_version/last_update_date=$online_version/g" "$gitlab_config_folder/config"
-    
+    && refreshDefaultConfigFile
+        
     # Cleaning
     rm -rf "$scriptServerVersion" "${script_full_path}.bak"
     
