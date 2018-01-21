@@ -3,7 +3,7 @@
 # Janusz Ładecki <szunaj13pl@gmail.com>
 # Created on 21.09.2017
 
-gitlab_version=18.1
+gitlab_version=18.1.2356
 github_url='https://github.com/szunaj13pl/shell-gitlab'
 gitlab_config_folder="$HOME/.config/gitlab"
 
@@ -12,6 +12,8 @@ gitlab_config_folder="$HOME/.config/gitlab"
 # GITLAB_PRIVATE_TOKEN=""
 PROJECT_SEARCH_PARAM=$1
 
+set -x ;
+set -o functrace
 
 function initial(){
     
@@ -73,9 +75,11 @@ function getServerVersion(){
 function refreshDefaultConfigFile(){
     
     cp "${scriptServerVersion}/default_config" "${gitlab_config_folder}/default_config"\
-    && mv "${gitlab_config_folder}/config" "${gitlab_config_folder}/config.bak"\
-    && cp "${gitlab_config_folder}/default_config" "${gitlab_config_folder}/config"
-    
+    && mv "${gitlab_config_folder}/config" "${gitlab_config_folder}/config.bak"
+
+    if [ ! -s "${gitlab_config_folder}/config" ]; then
+        cp "${gitlab_config_folder}/default_config" "${gitlab_config_folder}/config"
+    fi
 }
 
 
@@ -110,11 +114,11 @@ function checkLastUpdateDate(){
 
 function checkOnlineVersion(){
     
-    ping -c 2 Github.com 2>>/dev/null 1>&2 || (echo -e "Github.com ${RED} Unrechable ${NC}" && exit 1) || return 1 && exit 0
+    ping -c 2 Github.com 2>>/dev/null 1>&2 || (echo -e "Github.com ${RED} Unrechable ${NC}" && exit 1)
     
     getServerVersion
     
-    local server_version=$(grep --file "$scriptServerVersion"/gitlab --max-count=1 'gitlab_version' |  cut -d "=" -f 2)
+    local server_version=$(cat "${scriptServerVersion}/gitlab" | grep --max-count=1 'gitlab_version' |  cut -d "=" -f 2)
     
     versionCompare $gitlab_version $server_version || (echo "New wersion on GitHub" && replaceLocalScript $server_version )
 }
@@ -131,6 +135,8 @@ function replaceLocalScript(){
     
     # Cleaning
     rm -rf "$scriptServerVersion" "${script_full_path}.bak"
+    
+    gitlab && exit 0
 }
 
 
