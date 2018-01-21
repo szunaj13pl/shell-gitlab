@@ -12,8 +12,25 @@ gitlab_config_folder="$HOME/.config/gitlab"
 # GITLAB_PRIVATE_TOKEN=""
 PROJECT_SEARCH_PARAM=$1
 
-set -x ;
-set -o functrace
+
+usage() {
+    echo "Usage: $0  [ <string> 'to search repository' ] [ -d 'enable debuging mode' ]" 1>&2; exit 1;
+}
+
+while getopts ":d" o; do
+    case "${o}" in
+        d)
+            echo "Debug mode is ON"
+            
+            set -x ;
+            set -o functrace
+        ;;
+        *)
+            usage
+        ;;
+    esac
+done
+
 
 function initial(){
     
@@ -76,7 +93,7 @@ function refreshDefaultConfigFile(){
     
     cp "${scriptServerVersion}/default_config" "${gitlab_config_folder}/default_config"\
     && mv "${gitlab_config_folder}/config" "${gitlab_config_folder}/config.bak"
-
+    
     if [ ! -s "${gitlab_config_folder}/config" ]; then
         cp "${gitlab_config_folder}/default_config" "${gitlab_config_folder}/config"
     fi
@@ -131,7 +148,7 @@ function replaceLocalScript(){
     cp "$script_full_path" "${script_full_path}.bak" \
     && cp "${scriptServerVersion}/gitlab" $(dirname $script_full_path) \
     && refreshDefaultConfigFile
-        
+    
     # Cleaning
     rm -rf "$scriptServerVersion" "${script_full_path}.bak"
     
