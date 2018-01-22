@@ -15,9 +15,7 @@ Clone selected projects to current directory.
 
 ## Configuration
 
-Put it in __~/.bashrc__
-
-_in future will be in the config file [TODO #1](https://github.com/szunaj13pl/shell-gitlab/issues/1)_
+Run `gitlab -c` to edit configuration __~/.config/gitlab/config__
 
 |variable name          |value      |exemple                                                  |  
 |----------------------|------------|---------------------------------------------------------|
