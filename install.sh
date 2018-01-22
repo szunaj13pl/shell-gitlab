@@ -13,7 +13,7 @@ install_gitlab() {
         curl https://github.com/szunaj13pl/shell-gitlab/raw/master/install.sh 1>>/dev/null -s
     }
     
-    clean
+    clear
     
     # Use colors, but only if connected to a terminal, and that terminal
     # supports them.
