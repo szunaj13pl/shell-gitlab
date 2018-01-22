@@ -5,6 +5,8 @@
 
 install_gitlab() {
     
+    clear
+    
     # Use colors, but only if connected to a terminal, and that terminal
     # supports them.
     if which tput >/dev/null 2>&1; then
@@ -25,17 +27,41 @@ install_gitlab() {
         BOLD=""
         NORMAL=""
     fi
+
+    # Check if can reach github.com 
+    printf "${NORMAL}Checking if can reach ${YELLOW} ${BOLD}Github.com${NORMAL}\n"
+    ping -c 2 github.com >/dev/null 2>&1 || (printf "${NORMAL}Error: ${YELLOW}Github.com ${RED}is urechable${NORMAL}\n" && exit 1) || exit 1
+    
+    # Activate RAW version of install script
+    hash curl >/dev/null 2>&1 || {
+        wget https://github.com/szunaj13pl/shell-gitlab/raw/master/install.sh  2>>/dev/null 1>/dev/null
+    } || \
+    hash wget >/dev/null 2>&1 || {
+        curl https://github.com/szunaj13pl/shell-gitlab/raw/master/install.sh 1>>/dev/null -s
+    }
+    
     
     # Only enable exit-on-error after the non-critical colorization stuff,
     # which may fail on systems lacking tput or terminfo
     set -e
     
     # Create tempormaly folder for clean instalation
+    printf "${BLUE}Creating temporary folder${YELLOW} $temp_gitlab_folder ${BLUE}...${NORMAL}\n"
     
     local temp_gitlab_folder=$(mktemp -d /tmp/gitlab.XXXXXX)
     
     
+    # Check if git is installed
+    printf "${BLUE}Checking if ${YELLOW}git ${BLUE}is installed ...${NORMAL}\n"
+    
+    hash git >/dev/null 2>&1 || {
+        printf "${NORMAL}Error:${YELLOW}git ${RED}is not installed${NORMAL}\n"
+        exit 1
+    }
+    
+    
     # Download project
+    printf "${BLUE}Cloning ${BOLD}gitlab ${NORMAL}\n"
     
     git clone https://github.com/szunaj13pl/shell-gitlab.git "$temp_gitlab_folder"\
     && cd "$temp_gitlab_folder"
@@ -43,18 +69,22 @@ install_gitlab() {
     
     # Create 'bin' folder and copy script to it
     
+    printf "${BLUE}Checking if ${YELLOW}$HOME/bin${BLUE} exists ...${NORMAL}\n"
     mkdir -p $HOME/bin
+    
+    printf "${BLUE}Coping ${BOLD}gitlab ${NORMAL}${BLUE}to ${YELLOW}$HOME/bin ${NORMAL}\n"
     cp gitlab $HOME/bin
     
     
     # Add 'bin' folder to $PATH
+    printf "${BLUE}Checking if ${YELLOW}$HOME/bin${BLUE} is in PATH ...${NORMAL}\n"
     
     echo "$PATH"| grep --quiet "$HOME/bin" \
-    && echo 'export PATH="$HOME/bin:$PATH"' >> $HOME/.profile
+    && (echo 'export PATH="$HOME/bin:$PATH"' >> $HOME/.profile && printf "${GREEN} Adding ${YELLOW}$HOME/bin${GREEN} to PATH ...${NORMAL}\n")
     
     
     # Create configuration folder and copy 'default_config' to it
-    
+    printf "${BLUE}Creating gitlab configuration if not found any...${NORMAL}\n"
     mkdir -p $HOME/.config/gitlab
     cp default_config $HOME/.config/gitlab/default_config
     cp --no-clobber default_config $HOME/.config/gitlab/config
@@ -63,8 +93,9 @@ install_gitlab() {
     
     
     # Clean-up
+    printf "${BLUE}Cleaning...${NORMAL}\n"
     
     rm -rf "$temp_gitlab_folder"
 }
 
-install_gitlab && echo "Now you can use 'gitlab' like command"
+install_gitlab && printf "${BLUE}Now you can use ${YELLOW}gitlab ${BLUE}like command${NORMAL}\n"
