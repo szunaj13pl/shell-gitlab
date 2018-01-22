@@ -38,44 +38,53 @@ _in future will be in the config file [TODO #1](https://github.com/szunaj13pl/sh
 
 ## Instalation
 
-_In future will be instant instalation script [TODO #2](https://github.com/szunaj13pl/shell-gitlab/issues/2)_
-
+**via curl**
+```
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/szunaj13pl/shell-gitlab/develop/install.sh)"
+```
+**via wget**
+```
+sh -c "$(wget https://raw.githubusercontent.com/szunaj13pl/shell-gitlab/develop/install.sh -O -)"
+```
+**or step by step**
 
 ```
-# Create tempormaly folder for clean instalation
-
-    temp_gitlab_folder=$(mktemp -d /tmp/gitlab.XXXXXX)
-
-
-# Download project
-
-    git clone https://github.com/szunaj13pl/shell-gitlab.git "$temp_gitlab_folder"\
-    && cd "$temp_gitlab_folder"
-
-
-# Create '.bin' folder and copy script to it
-
-    mkdir -p $HOME/.bin
-    cp gitlab $HOME/.bin
-
-
-# Add '.bin' folder to $PATH
-
-    echo "$PATH"| grep --quiet $HOME/.bin\
-    && echo 'PATH="$HOME/.bin:$PATH"' >> $HOME/.profile
-
-
-# Create configuration folder and copy 'default_config' to it
-
-    mkdir -p $HOME/.config/gitlab
-    cp default_config $HOME/.config/gitlab/default_config
-    cp --no-clobber default_config $HOME/.config/gitlab/config
-
+    # Create tempormaly folder for clean instalation
     
-# Now you can use 'gitlab' like command 
+        local temp_gitlab_folder=$(mktemp -d /tmp/gitlab.XXXXXX)
+    
+    
+    # Download project
+    
+        git clone https://github.com/szunaj13pl/shell-gitlab.git "$temp_gitlab_folder"\
+        && cd "$temp_gitlab_folder"
+    
+    
+    # Create 'bin' folder and copy script to it
+    
+        mkdir -p $HOME/bin
+        cp gitlab $HOME/bin
+    
+    
+    # Add 'bin' folder to $PATH
+    
+        echo "$PATH"| grep --quiet "$HOME/bin" \
+        && echo 'export PATH="$HOME/bin:$PATH"' >> $HOME/.profile
+    
+    
+    # Create configuration folder and copy 'default_config' to it
+    
+        mkdir -p $HOME/.config/gitlab
+        cp default_config $HOME/.config/gitlab/default_config
+        cp --no-clobber default_config $HOME/.config/gitlab/config
+    
+    # Now you can use 'gitlab' like command
+    
+    
+    # Clean-up
+    
+        rm  -rf "$temp_gitlab_folder"
 
-# Clean-up
-
-    rm -rf "$temp_gitlab_folder"
+    # DONE! Now you can use 'gitlab' like command
 
 ```
