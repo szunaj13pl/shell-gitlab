@@ -8,6 +8,7 @@ Clone selected projects to current directory.
 ## Usage 
 
 `gitlab <string>` - Return list of projects matching the search criteria
+
 `gitlab -d` - Enable debuging mode 
 
 ## Configuration
@@ -35,7 +36,7 @@ _in future will be in the config file [TODO #1](https://github.com/szunaj13pl/sh
 
 ## Instalation
 
-_In future will be instant instalation script [TODO #2](https://github.com/szunaj13pl/shell-gitlab/issues/1)_
+_In future will be instant instalation script [TODO #2](https://github.com/szunaj13pl/shell-gitlab/issues/2)_
 
 
 ```
