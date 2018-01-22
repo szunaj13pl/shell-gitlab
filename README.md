@@ -49,7 +49,7 @@ _In future will be instant instalation script [TODO #2](https://github.com/szuna
 
 # Download project
 
-    git clone https://github.com/szunaj13pl/shell-gitlab.git\ "$temp_gitlab_folder"
+    git clone https://github.com/szunaj13pl/shell-gitlab.git "$temp_gitlab_folder"\
     && cd "$temp_gitlab_folder"
 
 
