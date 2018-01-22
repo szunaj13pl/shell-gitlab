@@ -3,7 +3,7 @@
 # Janusz Ładecki <szunaj13pl@gmail.com>
 # Created on 22.01.2018
 
-function install(){
+function install_gitlab(){
     
     # Create tempormaly folder for clean instalation
     
@@ -42,4 +42,4 @@ function install(){
     rm -rf "$temp_gitlab_folder"
 }
 
-install && echo "Now you can use 'gitlab' like command"
+install_gitlab && echo "Now you can use 'gitlab' like command"
