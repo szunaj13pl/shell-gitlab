@@ -10,7 +10,6 @@ gitlab_config_folder="$HOME/.config/gitlab"
 # Parameters
 # GITLAB_URL=""
 # GITLAB_PRIVATE_TOKEN=""
-PROJECT_SEARCH_PARAM=$1
 
 function initial(){
     
@@ -252,11 +251,11 @@ function run(){
 
 
 usage() {
-    echo "Usage: $0  [ <string> 'to search repository' ] [ -c 'edit configuration' ] [ -d 'enable debuging mode' ]" \
+    echo "Usage: $(basename $0) [ -c 'edit configuration' ] [ -d 'enable debuging mode' ] [ <string> 'to search repository' ]" \
     1>&2; exit 1;
 }
 
-while getopts ":d:c" o; do
+while getopts ":dc" o; do
     case "${o}" in
         d)
             echo "Debug mode is ON"
@@ -279,6 +278,9 @@ while getopts ":d:c" o; do
         ;;
     esac
 done
+shift $((OPTIND-1))
+
+PROJECT_SEARCH_PARAM="$1"
 
 
 # Defines variables and create temp files
