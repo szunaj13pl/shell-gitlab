@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Janusz Ładecki <szunaj13pl@gmail.com>
 # Created on 22.01.2018
 
