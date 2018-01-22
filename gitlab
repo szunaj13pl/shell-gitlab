@@ -12,26 +12,6 @@ gitlab_config_folder="$HOME/.config/gitlab"
 # GITLAB_PRIVATE_TOKEN=""
 PROJECT_SEARCH_PARAM=$1
 
-
-usage() {
-    echo "Usage: $0  [ <string> 'to search repository' ] [ -d 'enable debuging mode' ]" 1>&2; exit 1;
-}
-
-while getopts ":d" o; do
-    case "${o}" in
-        d)
-            echo "Debug mode is ON"
-            
-            set -x ;
-            set -o functrace
-        ;;
-        *)
-            usage
-        ;;
-    esac
-done
-
-
 function initial(){
     
     local scriptName=$(basename $0)
@@ -269,6 +249,36 @@ function run(){
     chmod +x "$gitlabScript"
     "$gitlabScript"
 }
+
+
+usage() {
+    echo "Usage: $0  [ <string> 'to search repository' ] [ -c 'edit configuration' ] [ -d 'enable debuging mode' ]" \
+    1>&2; exit 1;
+}
+
+while getopts ":d:c" o; do
+    case "${o}" in
+        d)
+            echo "Debug mode is ON"
+            
+            set -x ;
+            set -o functrace
+        ;;
+        c)
+            if [ -e "${gitlab_config_folder}/config" ]; then
+                $EDITOR "${gitlab_config_folder}/config"
+            else
+                checkConfig
+                $EDITOR "${gitlab_config_folder}/config"
+            fi
+            
+            exit 0
+        ;;
+        *)
+            usage
+        ;;
+    esac
+done
 
 
 # Defines variables and create temp files
