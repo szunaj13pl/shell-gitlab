@@ -5,14 +5,6 @@
 
 install_gitlab() {
     
-    # Activate RAW version of install script
-    hash curl >/dev/null 2>&1 || {
-        wget https://github.com/szunaj13pl/shell-gitlab/raw/master/install.sh  2>>/dev/null 1>/dev/null
-    } || \
-    hash wget >/dev/null 2>&1 || {
-        curl https://github.com/szunaj13pl/shell-gitlab/raw/master/install.sh 1>>/dev/null -s
-    }
-    
     clear
     
     # Use colors, but only if connected to a terminal, and that terminal
@@ -35,6 +27,19 @@ install_gitlab() {
         BOLD=""
         NORMAL=""
     fi
+
+    # Check if can reach github.com 
+    printf "${NORMAL}Checking if can reach ${YELLOW} ${BOLD}Github.com${NORMAL}\n"
+    ping -c 2 github.com >/dev/null 2>&1 || (printf "${NORMAL}Error: ${YELLOW}Github.com ${RED}is urechable${NORMAL}\n" && exit 1) || exit 1
+    
+    # Activate RAW version of install script
+    hash curl >/dev/null 2>&1 || {
+        wget https://github.com/szunaj13pl/shell-gitlab/raw/master/install.sh  2>>/dev/null 1>/dev/null
+    } || \
+    hash wget >/dev/null 2>&1 || {
+        curl https://github.com/szunaj13pl/shell-gitlab/raw/master/install.sh 1>>/dev/null -s
+    }
+    
     
     # Only enable exit-on-error after the non-critical colorization stuff,
     # which may fail on systems lacking tput or terminfo
@@ -79,7 +84,7 @@ install_gitlab() {
     
     
     # Create configuration folder and copy 'default_config' to it
-    printf "${BLUE}Looking for an existing gitlab config...${NORMAL}\n"
+    printf "${BLUE}Creating gitlab configuration if not found any...${NORMAL}\n"
     mkdir -p $HOME/.config/gitlab
     cp default_config $HOME/.config/gitlab/default_config
     cp --no-clobber default_config $HOME/.config/gitlab/config
@@ -93,4 +98,4 @@ install_gitlab() {
     rm -rf "$temp_gitlab_folder"
 }
 
-install_gitlab && printf "${BLUE}Now you can use like ${YELLOW}gitlab ${BLUE}command${NORMAL}\n"
+install_gitlab && printf "${BLUE}Now you can use ${YELLOW}gitlab ${BLUE}like command${NORMAL}\n"
