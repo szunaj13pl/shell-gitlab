@@ -16,16 +16,16 @@ function install_gitlab(){
     && cd "$temp_gitlab_folder"
     
     
-    # Create '.bin' folder and copy script to it
+    # Create 'bin' folder and copy script to it
     
-    mkdir -p $HOME/.bin
-    cp gitlab $HOME/.bin
+    mkdir -p $HOME/bin
+    cp gitlab $HOME/bin
     
     
-    # Add '.bin' folder to $PATH
+    # Add 'bin' folder to $PATH
     
-    echo "$PATH"| grep --quiet $HOME/.bin\
-    && echo 'PATH="$HOME/.bin:$PATH"' >> $HOME/.profile
+    echo "$PATH"| grep --quiet "$HOME/bin" \
+    && echo 'export PATH="$HOME/bin:$PATH"' >> $HOME/.profile
     
     
     # Create configuration folder and copy 'default_config' to it
