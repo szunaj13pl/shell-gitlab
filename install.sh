@@ -1,7 +1,7 @@
 # Janusz Ładecki <szunaj13pl@gmail.com>
 # Created on 22.01.2018
 
-function install_gitlab() {
+install_gitlab() {
     
     # Use colors, but only if connected to a terminal, and that terminal
     # supports them.
