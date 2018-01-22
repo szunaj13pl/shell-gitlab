@@ -51,7 +51,7 @@ sh -c "$(wget https://raw.githubusercontent.com/szunaj13pl/shell-gitlab/develop/
 ```
     # Create tempormaly folder for clean instalation
     
-        local temp_gitlab_folder=$(mktemp -d /tmp/gitlab.XXXXXX)
+        temp_gitlab_folder=$(mktemp -d /tmp/gitlab.XXXXXX)
     
     
     # Download project
