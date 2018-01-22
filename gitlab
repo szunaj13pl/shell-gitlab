@@ -70,7 +70,7 @@ function getServerVersion(){
 function refreshDefaultConfigFile(){
     
     cp "${scriptServerVersion}/default_config" "${gitlab_config_folder}/default_config"\
-    && mv "${gitlab_config_folder}/config" "${gitlab_config_folder}/config.bak"
+    && cp "${gitlab_config_folder}/config" "${gitlab_config_folder}/config.bak"
     
     if [ ! -s "${gitlab_config_folder}/config" ]; then
         cp "${gitlab_config_folder}/default_config" "${gitlab_config_folder}/config"
