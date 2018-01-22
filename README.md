@@ -9,6 +9,8 @@ Clone selected projects to current directory.
 
 `gitlab <string>` - Return list of projects matching the search criteria
 
+`gitlab -c` - Edit configuration
+
 `gitlab -d` - Enable debuging mode 
 
 ## Configuration
