@@ -19,8 +19,8 @@ Run `gitlab -c` to edit configuration __~/.config/gitlab/config__
 
 |variable name          |value      |exemple                                                  |  
 |----------------------|------------|---------------------------------------------------------|
-|`GITLAB_URL`| Gitlab HTTPS address |`export GITLAB_URL=gitlab.company.com`|
-|`GITLAB_PRIVATE_TOKEN`| Personal Access Token <br> Scopes **api** (Access your API)<br><br>  *https://<GITLAB_URL>/profile/personal_access_tokens*|`export GITLAB_PRIVATE_TOKEN=verySecretToken123`|
+|`GITLAB_URL`| Gitlab HTTPS address |`GITLAB_URL=gitlab.company.com`|
+|`GITLAB_PRIVATE_TOKEN`| Personal Access Token <br> Scopes **api** (Access your API)<br><br>  *https://<GITLAB_URL>/profile/personal_access_tokens*|`GITLAB_PRIVATE_TOKEN=verySecretToken123`|
 
 
 
