@@ -6,6 +6,7 @@
 gitlab_version=18.1.23.1025
 github_url='https://github.com/szunaj13pl/shell-gitlab'
 gitlab_config_folder="$HOME/.config/gitlab"
+just_update=false
 
 function initial(){
     
@@ -114,7 +115,7 @@ function checkConfig(){
 
 function checkLastUpdateDate(){
     
-    if [ $autoupdate == true ] || [ "$just_update" == true ]; then
+    if [ $autoupdate == true ] || [ ! -z ${just_update+x} ]; then
         
         # Get last update date from config
         local last_update_date=$(cat "${gitlab_config_folder}/config" | grep --perl-regexp  'last_update_date\=([0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2})' | cut -d "=" -f 2)
