@@ -6,7 +6,6 @@
 gitlab_version=18.1.23.1140
 github_url='https://github.com/szunaj13pl/shell-gitlab'
 gitlab_config_folder="$HOME/.config/gitlab"
-just_update=false
 
 function initial(){
     
@@ -17,8 +16,7 @@ function initial(){
     gitlabGit=$(mktemp /tmp/$scriptName.XXXXXX)
     gitlabJson=$(mktemp /tmp/$scriptName.XXXXXX)
     
-    # Use colors, but only if connected to a terminal, and that terminal
-    # supports them.
+    # Use colors, but only if connected to a terminal, and that terminal supports them.
     if which tput >/dev/null 2>&1; then
         ncolors=$(tput colors)
     fi
@@ -165,38 +163,15 @@ function replaceLocalScript(){
 }
 
 
-function aptpro() {
-    # Waits if dpkg is busy
-    
-    i=0
-    tput sc
-    while fuser /var/lib/dpkg/lock >/dev/null 2>&1 ; do
-        case $(($i % 4)) in
-            0 ) j="-" ;;
-            1 ) j="\\" ;;
-            2 ) j="|" ;;
-            3 ) j="/" ;;
-        esac
-        tput rc
-        echo -en "\r[ ${RED}$j ${NORMAL}] ${YELLOW} Waiting for other software managers to finish... ${NORMAL}"
-        sleep 0.5
-        ((i=i+1))
-    done
-    
-    echo -e "\n"
-    sudo /usr/bin/apt-get "$@"
-}
-
-
 function isInstalled(){
     
-    local packagesName=$@
+    local packagesName="$@"
     
     for package in $packagesName; do
         INSTALLED=$(dpkg-query -s "$package" 2>&1 | grep --no-messages Status )
         if [ "$INSTALLED" != "Status: install ok installed" ]; then
             echo -e "${NORMAL} $package ${RED}not installed ${NORMAL}"
-            aptpro install -y "$package"
+            sudo apt-get install -y "$package"
         fi
     done
     
@@ -206,13 +181,15 @@ function isInstalled(){
 function preRunCheck(){
     
     if [ -z "$GITLAB_URL" ]; then
-        echo -e "${RED}Please set the environment variable GITLAB_URL ${NORMAL}"
+        echo -e "Please set the variable ${RED}GITLAB_URL ${NORMAL}"
+        echo -e "\n\t Run ${YELLOW} $(basename $0) -c ${NORMAL}"
         exit 1
     fi
     
     if [ -z "$GITLAB_PRIVATE_TOKEN" ]; then
-        echo -e "${RED}Please set the environment variable GITLAB_PRIVATE_TOKEN ${NORMAL}"
-        echo "See ${GITLAB_URL}/profile/account"
+        echo -e "Please set the variable ${RED}GITLAB_PRIVATE_TOKEN ${NORMAL}"
+        echo "See ${BLUE}${GITLAB_URL}/profile/account ${NORMAL}"
+        echo -e echo -e "\n\t Run ${YELLOW} $(basename $0) -c ${NORMAL}"
         exit 1
     fi
     
