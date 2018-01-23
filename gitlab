@@ -3,7 +3,7 @@
 # Janusz Ładecki <szunaj13pl@gmail.com>
 # Created on 21.09.2017
 
-gitlab_version=18.1.23.1025
+gitlab_version=18.1.23.1140
 github_url='https://github.com/szunaj13pl/shell-gitlab'
 gitlab_config_folder="$HOME/.config/gitlab"
 just_update=false
@@ -115,7 +115,11 @@ function checkConfig(){
 
 function checkLastUpdateDate(){
     
+<<<<<<< HEAD
     if [ $autoupdate == true ] || [ ! -z ${just_update+x} ]; then
+=======
+    if [ "$autoupdate" == true ] || [ ! -z ${just_update+x} ]; then
+>>>>>>> release/18.1.23.1140
         
         # Get last update date from config
         local last_update_date=$(cat "${gitlab_config_folder}/config" | grep --perl-regexp  'last_update_date\=([0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2})' | cut -d "=" -f 2)
@@ -144,8 +148,10 @@ function checkOnlineVersion(){
     
     local server_version=$(cat "${scriptServerVersion}/gitlab" | grep --max-count=1 'gitlab_version' |  cut -d "=" -f 2)
     
-    versionCompare $gitlab_version $server_version || (echo "New wersion on GitHub" && replaceLocalScript $server_version )
+    versionCompare $gitlab_version $server_version && echo -e "${YELLOW} Latest version is instaled ${NORMAL}" || (echo -e "${GREEN} New wersion on GitHub ${NORMAL}" && replaceLocalScript $server_version )
+
 }
+
 
 function replaceLocalScript(){
     
