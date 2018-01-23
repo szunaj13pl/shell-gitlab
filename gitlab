@@ -36,7 +36,7 @@ function initial(){
         BOLD=""
         NORMAL=""
     fi
-
+    
 }
 
 
@@ -114,15 +114,22 @@ function checkConfig(){
 
 function checkLastUpdateDate(){
     
-    # Get last update date from config
-    local last_update_date=$(cat "${gitlab_config_folder}/config" | grep --perl-regexp  'last_update_date\=([0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2})' | cut -d "=" -f 2)
-    local current_date="$(date +%F)"
-    
-    if [[ ! "$current_date" == "$last_update_date" ]]
-    then
-        echo "Check for update" && checkOnlineVersion
-        sed -E -i "s/last_update_date\=([0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2})/last_update_date\=$current_date/" "${gitlab_config_folder}/config"\
-        || echo "Missing 'last_update_date' parameter in ${gitlab_config_folder}/config"
+    if [ $autoupdate == true ]; then
+        
+        # Get last update date from config
+        local last_update_date=$(cat "${gitlab_config_folder}/config" | grep --perl-regexp  'last_update_date\=([0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2})' | cut -d "=" -f 2)
+        local current_date="$(date +%F)"
+        
+        if [[ ! "$current_date" == "$last_update_date" ]]
+        then
+            echo "Check for update" && checkOnlineVersion
+            sed -E -i "s/last_update_date\=([0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2})/last_update_date\=$current_date/" "${gitlab_config_folder}/config"\
+            || echo "Missing 'last_update_date' parameter in ${gitlab_config_folder}/config"
+        fi
+        
+    else
+
+        echo -e "Autoupdate is${RED} OFF ${NORMAL}"
     fi
     
 }

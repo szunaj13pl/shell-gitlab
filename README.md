@@ -19,6 +19,7 @@ Run `gitlab -c` to edit configuration __~/.config/gitlab/config__
 
 |variable name          |value      |exemple                                                  |  
 |----------------------|------------|---------------------------------------------------------|
+|`autoupdate`|(default) true <br> _Check update once prer day_|`autoupdate=true`|
 |`GITLAB_URL`| Gitlab HTTPS address |`GITLAB_URL=gitlab.company.com`|
 |`GITLAB_PRIVATE_TOKEN`| Personal Access Token <br> Scopes **api** (Access your API)<br><br>  *https://<GITLAB_URL>/profile/personal_access_tokens*|`GITLAB_PRIVATE_TOKEN=verySecretToken123`|
 
