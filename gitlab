@@ -3,7 +3,7 @@
 # Janusz Ładecki <szunaj13pl@gmail.com>
 # Created on 21.09.2017
 
-gitlab_version=18.1.23
+gitlab_version=18.1.23.1025
 github_url='https://github.com/szunaj13pl/shell-gitlab'
 gitlab_config_folder="$HOME/.config/gitlab"
 
@@ -16,9 +16,26 @@ function initial(){
     gitlabGit=$(mktemp /tmp/$scriptName.XXXXXX)
     gitlabJson=$(mktemp /tmp/$scriptName.XXXXXX)
     
-    # Colors
-    RED='\033[0;31m'
-    NC='\033[0m' # No Color
+    # Use colors, but only if connected to a terminal, and that terminal
+    # supports them.
+    if which tput >/dev/null 2>&1; then
+        ncolors=$(tput colors)
+    fi
+    if [ -t 1 ] && [ -n "$ncolors" ] && [ "$ncolors" -ge 8 ]; then
+        RED="$(tput setaf 1)"
+        GREEN="$(tput setaf 2)"
+        YELLOW="$(tput setaf 3)"
+        BLUE="$(tput setaf 4)"
+        BOLD="$(tput bold)"
+        NORMAL="$(tput sgr0)"
+    else
+        RED=""
+        GREEN=""
+        YELLOW=""
+        BLUE=""
+        BOLD=""
+        NORMAL=""
+    fi
     
 }
 
@@ -97,15 +114,22 @@ function checkConfig(){
 
 function checkLastUpdateDate(){
     
-    # Get last update date from config
-    local last_update_date=$(cat "${gitlab_config_folder}/config" | grep --perl-regexp  'last_update_date\=([0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2})' | cut -d "=" -f 2)
-    local current_date="$(date +%F)"
-    
-    if [[ ! "$current_date" == "$last_update_date" ]]
-    then
-        echo "Check for update" && checkOnlineVersion
-        sed -E -i "s/last_update_date\=([0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2})/last_update_date\=$current_date/" "${gitlab_config_folder}/config"\
-        || echo "Missing 'last_update_date' parameter in ${gitlab_config_folder}/config"
+    if [ $autoupdate == true ] || [ "$just_update" == true ]; then
+        
+        # Get last update date from config
+        local last_update_date=$(cat "${gitlab_config_folder}/config" | grep --perl-regexp  'last_update_date\=([0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2})' | cut -d "=" -f 2)
+        local current_date="$(date +%F)"
+        
+        if [[ ! "$current_date" == "$last_update_date" ]] || [ "$just_update" == true ]
+        then
+            echo "Check for update" && checkOnlineVersion
+            sed -E -i "s/last_update_date\=([0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2})/last_update_date\=$current_date/" "${gitlab_config_folder}/config"\
+            || echo "Missing 'last_update_date' parameter in ${gitlab_config_folder}/config"
+        fi
+        
+    else
+        
+        echo -e "Autoupdate is${RED} OFF ${NORMAL}"
     fi
     
 }
@@ -113,7 +137,7 @@ function checkLastUpdateDate(){
 
 function checkOnlineVersion(){
     
-    ping -c 2 Github.com 2>>/dev/null 1>&2 || (echo -e "Github.com ${RED} Unrechable ${NC}" && exit 1)
+    ping -c 2 Github.com 2>>/dev/null 1>&2 || (echo -e "Github.com ${RED} Unrechable ${NORMAL}" && exit 1)
     
     getServerVersion
     
@@ -138,6 +162,29 @@ function replaceLocalScript(){
 }
 
 
+function aptpro() {
+    # Waits if dpkg is busy
+    
+    i=0
+    tput sc
+    while fuser /var/lib/dpkg/lock >/dev/null 2>&1 ; do
+        case $(($i % 4)) in
+            0 ) j="-" ;;
+            1 ) j="\\" ;;
+            2 ) j="|" ;;
+            3 ) j="/" ;;
+        esac
+        tput rc
+        echo -en "\r[ ${RED}$j ${NORMAL}] ${YELLOW} Waiting for other software managers to finish... ${NORMAL}"
+        sleep 0.5
+        ((i=i+1))
+    done
+    
+    echo -e "\n"
+    sudo /usr/bin/apt-get "$@"
+}
+
+
 function isInstalled(){
     
     local packagesName=$@
@@ -145,8 +192,8 @@ function isInstalled(){
     for package in $packagesName; do
         INSTALLED=$(dpkg-query -s "$package" 2>&1 | grep --no-messages Status )
         if [ "$INSTALLED" != "Status: install ok installed" ]; then
-            echo -e "${NC} $package ${RED}not installed ${NC}"
-            sudo apt install -y "$package"
+            echo -e "${NORMAL} $package ${RED}not installed ${NORMAL}"
+            aptpro install -y "$package"
         fi
     done
     
@@ -156,17 +203,17 @@ function isInstalled(){
 function preRunCheck(){
     
     if [ -z "$GITLAB_URL" ]; then
-        echo -e "${RED}Please set the environment variable GITLAB_URL ${NC}"
+        echo -e "${RED}Please set the environment variable GITLAB_URL ${NORMAL}"
         exit 1
     fi
     
     if [ -z "$GITLAB_PRIVATE_TOKEN" ]; then
-        echo -e "${RED}Please set the environment variable GITLAB_PRIVATE_TOKEN ${NC}"
+        echo -e "${RED}Please set the environment variable GITLAB_PRIVATE_TOKEN ${NORMAL}"
         echo "See ${GITLAB_URL}/profile/account"
         exit 1
     fi
     
-    ping -c 2 "$GITLAB_URL" 2>>/dev/null 1>&2 || (echo -e "$GITLAB_URL ${RED} Unrechable ${NC}" && exit 1) || exit 1
+    ping -c 2 "$GITLAB_URL" 2>>/dev/null 1>&2 || (echo -e "$GITLAB_URL ${RED} Unrechable ${NORMAL}" && exit 1) || exit 1
     
 }
 
@@ -176,7 +223,7 @@ function getData(){
     local responseCode=$(curl -s -o "$gitlabJson" -w "%{http_code}" "https://${GITLAB_URL}/api/v3/projects?private_token=$GITLAB_PRIVATE_TOKEN&search=$PROJECT_SEARCH_PARAM&per_page=999&sort=asc&order_by=name")
     
     if [ ! "$responseCode" == 200 ];then
-        echo -e "$GITLAB_URL ${RED} Response code $responseCode ${NC}\n"
+        echo -e "$GITLAB_URL ${RED} Response code $responseCode ${NORMAL}\n"
         cat "$gitlabJson"
         exit 1
     fi
@@ -261,11 +308,11 @@ function run(){
 
 
 usage() {
-    echo "Usage: $(basename $0) [ -c 'edit configuration' ] [ -d 'enable debuging mode' ] [ <string> 'to search repository' ]" \
+    echo "Usage: $(basename $0) [ -c 'edit configuration' ] [ -d 'enable debuging mode' ] [ -u 'self update' ] [ <string> 'to search repository' ]" \
     1>&2; exit 1;
 }
 
-while getopts ":dc" o; do
+while getopts ":dcu" o; do
     case "${o}" in
         d)
             echo "Debug mode is ON"
@@ -282,6 +329,9 @@ while getopts ":dc" o; do
             fi
             
             exit 0
+        ;;
+        u)
+            just_update=true
         ;;
         *)
             usage
@@ -304,6 +354,8 @@ checkConfig
 
 # Check for new update
 checkLastUpdateDate
+
+[ "$just_update" == true ] && exit 0
 
 # Check if all variables ar defined and server is online
 preRunCheck

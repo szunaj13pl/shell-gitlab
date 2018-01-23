@@ -11,6 +11,8 @@ Clone selected projects to current directory.
 
 `gitlab -c` - Edit configuration
 
+`gitlab -u` - Self update
+
 `gitlab -d` - Enable debuging mode 
 
 ## Configuration
@@ -19,8 +21,9 @@ Run `gitlab -c` to edit configuration __~/.config/gitlab/config__
 
 |variable name          |value      |exemple                                                  |  
 |----------------------|------------|---------------------------------------------------------|
-|`GITLAB_URL`| Gitlab HTTPS address |`export GITLAB_URL=gitlab.company.com`|
-|`GITLAB_PRIVATE_TOKEN`| Personal Access Token <br> Scopes **api** (Access your API)<br><br>  *https://<GITLAB_URL>/profile/personal_access_tokens*|`export GITLAB_PRIVATE_TOKEN=verySecretToken123`|
+|`autoupdate`|(default) true <br> _Check update once prer day_|`autoupdate=true`|
+|`GITLAB_URL`| Gitlab HTTPS address |`GITLAB_URL=gitlab.company.com`|
+|`GITLAB_PRIVATE_TOKEN`| Personal Access Token <br> Scopes **api** (Access your API)<br><br>  *https://<GITLAB_URL>/profile/personal_access_tokens*|`GITLAB_PRIVATE_TOKEN=verySecretToken123`|
 
 
 
