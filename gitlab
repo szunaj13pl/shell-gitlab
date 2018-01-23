@@ -3,9 +3,10 @@
 # Janusz Ładecki <szunaj13pl@gmail.com>
 # Created on 21.09.2017
 
-gitlab_version=18.1.23.10251
+gitlab_version=18.1.23.1140
 github_url='https://github.com/szunaj13pl/shell-gitlab'
 gitlab_config_folder="$HOME/.config/gitlab"
+just_update=false
 
 function initial(){
     
@@ -114,7 +115,11 @@ function checkConfig(){
 
 function checkLastUpdateDate(){
     
+<<<<<<< HEAD
+    if [ $autoupdate == true ] || [ ! -z ${just_update+x} ]; then
+=======
     if [ "$autoupdate" == true ] || [ ! -z ${just_update+x} ]; then
+>>>>>>> release/18.1.23.1140
         
         # Get last update date from config
         local last_update_date=$(cat "${gitlab_config_folder}/config" | grep --perl-regexp  'last_update_date\=([0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2})' | cut -d "=" -f 2)
@@ -324,10 +329,10 @@ while getopts ":dcu" o; do
         ;;
         c)
             if [ -e "${gitlab_config_folder}/config" ]; then
-                $EDITOR "${gitlab_config_folder}/config"
+                editor "${gitlab_config_folder}/config"
             else
                 checkConfig
-                $EDITOR "${gitlab_config_folder}/config"
+                editor "${gitlab_config_folder}/config"
             fi
             
             exit 0
