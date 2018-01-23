@@ -6,6 +6,7 @@
 gitlab_version=18.1.23.1025
 github_url='https://github.com/szunaj13pl/shell-gitlab'
 gitlab_config_folder="$HOME/.config/gitlab"
+just_update=false
 
 function initial(){
     
