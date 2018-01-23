@@ -1,4 +1,5 @@
-# Gitlab in shell 
+# Gitlab in shell
+_testing on Ubuntu 16.04_ <span style="color:green"><b>PASS</b></span>
 
 Search and clone Gitlab project directly from shell with nice and clean GUI.
 
@@ -50,6 +51,11 @@ sh -c "$(wget https://raw.githubusercontent.com/szunaj13pl/shell-gitlab/develop/
 **or step by step**
 
 ```
+    # Install requirements
+
+        sudo apt install git jq dialog curl
+
+
     # Create tempormaly folder for clean instalation
     
         temp_gitlab_folder=$(mktemp -d /tmp/gitlab.XXXXXX)
