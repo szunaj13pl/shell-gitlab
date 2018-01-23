@@ -114,13 +114,13 @@ function checkConfig(){
 
 function checkLastUpdateDate(){
     
-    if [ $autoupdate == true ]; then
+    if [ $autoupdate == true ] || [ "$just_update" == true ]; then
         
         # Get last update date from config
         local last_update_date=$(cat "${gitlab_config_folder}/config" | grep --perl-regexp  'last_update_date\=([0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2})' | cut -d "=" -f 2)
         local current_date="$(date +%F)"
         
-        if [[ ! "$current_date" == "$last_update_date" ]]
+        if [[ ! "$current_date" == "$last_update_date" ]] || [ "$just_update" == true ]
         then
             echo "Check for update" && checkOnlineVersion
             sed -E -i "s/last_update_date\=([0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2})/last_update_date\=$current_date/" "${gitlab_config_folder}/config"\
@@ -128,7 +128,7 @@ function checkLastUpdateDate(){
         fi
         
     else
-
+        
         echo -e "Autoupdate is${RED} OFF ${NORMAL}"
     fi
     
@@ -308,11 +308,11 @@ function run(){
 
 
 usage() {
-    echo "Usage: $(basename $0) [ -c 'edit configuration' ] [ -d 'enable debuging mode' ] [ <string> 'to search repository' ]" \
+    echo "Usage: $(basename $0) [ -c 'edit configuration' ] [ -d 'enable debuging mode' ] [ -u 'self update' ] [ <string> 'to search repository' ]" \
     1>&2; exit 1;
 }
 
-while getopts ":dc" o; do
+while getopts ":dcu" o; do
     case "${o}" in
         d)
             echo "Debug mode is ON"
@@ -329,6 +329,9 @@ while getopts ":dc" o; do
             fi
             
             exit 0
+        ;;
+        u)
+            just_update=true
         ;;
         *)
             usage
@@ -351,6 +354,8 @@ checkConfig
 
 # Check for new update
 checkLastUpdateDate
+
+[ "$just_update" == true ] && exit 0
 
 # Check if all variables ar defined and server is online
 preRunCheck

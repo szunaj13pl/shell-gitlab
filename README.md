@@ -11,6 +11,8 @@ Clone selected projects to current directory.
 
 `gitlab -c` - Edit configuration
 
+`gitlab -u` - Self update
+
 `gitlab -d` - Enable debuging mode 
 
 ## Configuration
