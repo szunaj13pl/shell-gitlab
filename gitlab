@@ -322,10 +322,10 @@ while getopts ":dcu" o; do
         ;;
         c)
             if [ -e "${gitlab_config_folder}/config" ]; then
-                $EDITOR "${gitlab_config_folder}/config"
+                editor "${gitlab_config_folder}/config"
             else
                 checkConfig
-                $EDITOR "${gitlab_config_folder}/config"
+                editor "${gitlab_config_folder}/config"
             fi
             
             exit 0
