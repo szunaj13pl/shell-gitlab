@@ -42,11 +42,11 @@ Run `gitlab -c` to edit configuration __~/.config/gitlab/config__
 
 **via curl**
 ```
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/szunaj13pl/shell-gitlab/develop/install.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/szunaj13pl/shell-gitlab/master/install.sh)"
 ```
 **via wget**
 ```
-sh -c "$(wget https://raw.githubusercontent.com/szunaj13pl/shell-gitlab/develop/install.sh -O -)"
+sh -c "$(wget https://raw.githubusercontent.com/szunaj13pl/shell-gitlab/master/install.sh -O -)"
 ```
 **or step by step**
 
