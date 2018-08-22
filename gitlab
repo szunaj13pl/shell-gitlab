@@ -200,7 +200,7 @@ function preRunCheck(){
 
 function getData(){
     
-    local responseCode=$(curl -s -o "$gitlabJson" -w "%{http_code}" "https://${GITLAB_URL}/api/v3/projects?private_token=$GITLAB_PRIVATE_TOKEN&search=$PROJECT_SEARCH_PARAM&per_page=999&sort=asc&order_by=name")
+    local responseCode=$(curl -s -o "$gitlabJson" -w "%{http_code}" "https://${GITLAB_URL}/api/v4/projects?private_token=$GITLAB_PRIVATE_TOKEN&search=$PROJECT_SEARCH_PARAM&per_page=999&sort=asc&order_by=name")
     
     if [ ! "$responseCode" == 200 ];then
         echo -e "$GITLAB_URL ${RED} Response code $responseCode ${NORMAL}\n"
